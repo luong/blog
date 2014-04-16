@@ -89,5 +89,6 @@ class PostFixture extends CakeTestFixture {
 			) 
 	);
 }
+
 ?>
  
