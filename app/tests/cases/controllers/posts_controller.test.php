@@ -75,7 +75,7 @@ class PostsControllerTest extends CakeTestCase {
 		$this->assertEqual($result[10]['Post']['body'], 'eleventh Article Body');
 		
 	}
-	/*
+	
 	function testDelete() {
 		$this->Posts->data = 10;
 		$this->Posts->params = Router::parse('/posts/delete');
@@ -85,11 +85,7 @@ class PostsControllerTest extends CakeTestCase {
 		
 		$result = $this->Posts->Post->find('all');
 		$this->assertEqual(count($result), 10);
-		/*$result = $this->testAction ( '/posts/delete/10', array (
-				'return' => 'vars' 
-		) );
-		$this->assertEqual ( count ( $result ['posts'] ), 10 );
-	}*/
+	}
 
 	function testEdit() {
 		$this->Posts->data = array (
