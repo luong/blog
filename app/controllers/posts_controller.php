@@ -35,7 +35,7 @@ class PostsController extends AppController {
     	} else {
     		if ($this->Post->save($this->data)) {
     			$this->Session->setFlash('Your post has been updated.');
-    			//$this->redirect(array('action' => 'index'));
+    			$this->redirect(array('action' => 'index'));
     		}
     	}
     }

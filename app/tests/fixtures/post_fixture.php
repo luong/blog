@@ -1,21 +1,8 @@
 <?php
 class PostFixture extends CakeTestFixture {
 	var $name = 'Post';
-	
-	var $fields = array (
-			'id' => array (
-					'type' => 'integer',
-					'key' => 'primary' 
-			),
-			'title' => array (
-					'type' => 'string',
-					'length' => 50 
-			),
-			'body' => 'text',
-			'created' => 'datetime',
-			'modified' => 'datetime' 
-	);
-	
+	var $import = array('table' => 'posts');
+
 	var $records = array (
 			array (
 					'id' => 1,
