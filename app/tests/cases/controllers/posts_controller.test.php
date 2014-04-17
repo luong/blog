@@ -77,14 +77,13 @@ class PostsControllerTest extends CakeTestCase {
 	}
 	
 	function testDelete() {
-		$this->Posts->data = 10;
 		$this->Posts->params = Router::parse('/posts/delete');
 		$this->Posts->beforeFilter();
 		$this->Posts->Component->startup($this->Posts);
-		$this->Posts->delete();
+		$this->Posts->delete(10);
 		
 		$result = $this->Posts->Post->find('all');
-		$this->assertEqual(count($result), 10);
+		$this->assertEqual(count($result), 9);
 	}
 
 	function testEdit() {
