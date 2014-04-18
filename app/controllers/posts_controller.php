@@ -5,32 +5,42 @@ class PostsController extends AppController {
     var $paginate = array();
     
     function index() {
-    	$keyword = $this->data["Post"]["keyword"];
-    	if($keyword == "") {
-    		$this->paginate = array(
-		    		'fields' => array('Post.id', 'Post.title', 'Post.Created'),
-		    		'limit' => 4,
-		    		'order' => array(
-		    				'Post.id' => 'asc'
-		    		)
-		    );
-    	}
-    	else {
-    		$this->paginate = array(
-    				'fields' => array('Post.id', 'Post.title', 'Post.Created'),
-    				'conditions' => array (
-					        'OR' => array(
-					            "id"=> $keyword,
-					            'title LIKE' => '%'.$keyword.'%'
-					)
-    			)
+    	$conditions = array();
+
+    	if(isset($this->passedArgs['Post.keyword'])) {
+            $keyword = $this->passedArgs['Post.keyword'];
+            $conditions[] = array (
+    				'OR' => array(
+    					"id"=> $keyword,
+    					'title LIKE' => '%'.$keyword.'%'
+    				) 
     		);
-    	}	
-    	 	
-    	$data = $this->paginate("Post");
-    	$this->set('posts', $data);
+            $data['Post']['keyword'] = $keyword; 
+        }
+        //Limit and Order By
+        $this->paginate= array(
+        		'limit' => 4,
+        		'order' => array('Post.id' => 'asc'),
+        );
+
+        $this->set("posts",$this->paginate("Post",$conditions));
     }
 
+	function search() {
+        // the page we will redirect to
+        $url['action'] = 'index';
+        
+        // build a URL will all the search elements in it
+        foreach ($this->data as $k=>$v){ 
+            foreach ($v as $kk=>$vv){ 
+                $url[$k.'.'.$kk]=$vv; 
+            } 
+        }
+        
+        // redirect the user to the url
+        $this->redirect($url, null, true);
+    }  
+    
     function view($id) {
         $this->Post->id = $id;
         $this->set('post', $this->Post->read());
