@@ -44,9 +44,9 @@
 	</table>
 	<div id="container">
 		<div class="pagination">
-			<?php echo $this->Paginator->numbers(array('class' => 'page active')); ?>
-			<?php echo $this->Paginator->prev('« Previous', null, null, array('class' => 'disable')); ?>
-			<?php echo $this->Paginator->next('Next »', null, null, array('class' => 'disable')); ?>
+			<?php echo $this->Paginator->numbers(array('class' => 'page')); ?>
+			<?php echo $this->Paginator->prev('« Previous', array('class' => 'page active'), null, array('class' => 'disable')); ?>
+			<?php echo $this->Paginator->next('Next »', array('class' => 'page active'), null, array('class' => 'disable')); ?>
 		</div>
 	</div>
 </form>

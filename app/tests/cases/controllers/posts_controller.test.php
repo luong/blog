@@ -62,8 +62,7 @@ class PostsControllerTest extends CakeTestCase {
 		$this->assertEqual(count($result['posts']), 2);
 		$postIds = Set::extract('/Post/id', $result['posts']);
 		// Assert post ids
-		$this->assertEqual($postIds, array(9, 10));
-		
+		$this->assertEqual($postIds, array(9, 10));		
 		// check search data with id = 1
 		$data = array('Post' => array (
 				'keyword' => 1
@@ -74,8 +73,7 @@ class PostsControllerTest extends CakeTestCase {
 				'method' => 'post'
 		));
 		$this->assertEqual(count($result['posts']), 1);
-		$this->assertEqual($result['posts'][0]['Post']['title'], "First Article");
-		
+		$this->assertEqual($result['posts'][0]['Post']['title'], "First Article");		
 		// check search data with title like %seventh%
 		$data = array('Post' => array (
 				'keyword' => 'seventh'

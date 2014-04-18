@@ -25,7 +25,8 @@ class PostsController extends AppController {
 					)
     			)
     		);
-    	}	 	
+    	}	
+    	 	
     	$data = $this->paginate("Post");
     	$this->set('posts', $data);
     }
