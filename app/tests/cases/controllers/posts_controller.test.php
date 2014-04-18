@@ -44,7 +44,6 @@ class PostsControllerTest extends CakeTestCase {
 		$postIds = Set::extract('/Post/id', $result['posts']);
 		// Assert post ids
 		$this->assertEqual($postIds, array(1, 2, 3, 4));
-		
 		// Check data in page 2
 		$result = $this->testAction ('/posts/index/page:2', array(
 				'return' => 'vars'

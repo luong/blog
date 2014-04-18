@@ -16,38 +16,39 @@
 <p><?php echo $this->Html->link("Add Post", array('action' => 'add')); ?></p>
 
 <form id="formIndex" action="<?php echo $this->webroot;?>posts" method="post" >
-<input id="keyword" type="text" name="data[Post][keyword]">
-<input type="submit" onclick="submitSearch()" value="Search">
-<table>
-    <tr>
-        <th><?php echo $this->Paginator->sort('ID', 'id'); ?></th>
-        <th><?php echo $this->Paginator->sort('Title', 'title'); ?></th>
-        <th><?php echo $this->Paginator->sort('Action', ''); ?></th>
-        <th><?php echo $this->Paginator->sort('Created', 'created'); ?></th>
-    </tr>
-       <?php foreach($posts as $post): ?>
-    <tr>
-        <td><?php echo $post['Post']['id']; ?> </td>
-        <td><?php echo $this->Html->link($post['Post']['title'], array('action' => 'view', $post['Post']['id'])); ?> </td>
-        <td>
-            <?php echo $this->Html->link(
-                'Delete',
-                array('action' => 'delete', $post['Post']['id']),
-                null,
-                'Are you sure?'
-            )?>
-            <?php echo $this->Html->link('Edit', array('action' => 'edit', $post['Post']['id']));?>
-        </td>
-        <td><?php echo $post['Post']['Created']; ?> </td>
-    </tr>
-    <?php endforeach; ?>
-</table>
-<!-- Shows the page numbers -->
-<?php echo $this->Paginator->numbers(); ?>
-<!-- Shows the next and previous links -->
-<?php echo $this->Paginator->prev('« Previous', null, null, array('class' => 'disabled')); ?>
-<?php echo $this->Paginator->next('Next »', null, null, array('class' => 'disabled')); ?>
-<!-- prints X of Y, where X is current page and Y is number of pages -->
-<?php echo $this->Paginator->counter(); ?>
-<input type="hidden" name="data[Post][flag]" value="">
+	<input id="keyword" type="text" name="data[Post][keyword]">
+	<input type="submit" onclick="submitSearch()" value="Search">
+	<table>
+	    <tr>
+	        <th><?php echo $this->Paginator->sort('ID', 'id'); ?></th>
+	        <th><?php echo $this->Paginator->sort('Title', 'title'); ?></th>
+	        <th><?php echo $this->Paginator->sort('Action', ''); ?></th>
+	        <th><?php echo $this->Paginator->sort('Created', 'created'); ?></th>
+	    </tr>
+	       <?php foreach($posts as $post): ?>
+	    <tr>
+	        <td><?php echo $post['Post']['id']; ?> </td>
+	        <td><?php echo $this->Html->link($post['Post']['title'], array('action' => 'view', $post['Post']['id'])); ?> </td>
+	        <td>
+	            <?php echo $this->Html->link(
+	                'Delete',
+	                array('action' => 'delete', $post['Post']['id']),
+	                null,
+	                'Are you sure?'
+	            )?>
+	            <?php echo $this->Html->link('Edit', array('action' => 'edit', $post['Post']['id']));?>
+	        </td>
+	        <td><?php echo $post['Post']['Created']; ?> </td>
+	    </tr>
+	    <?php endforeach; ?>
+	</table>
+	<!-- Shows the page numbers -->
+	<?php echo $this->Paginator->numbers(); ?>
+	<!-- Shows the next and previous links -->
+	<?php echo $this->Paginator->prev('« Previous', null, null, array('class' => 'disabled')); ?>
+	<?php echo $this->Paginator->next('Next »', null, null, array('class' => 'disabled')); ?>
+	<!-- prints X of Y, where X is current page and Y is number of pages -->
+	<?php echo $this->Paginator->counter(); ?>
+	<input type="hidden" name="data[Post][flag]" value="">
+
 </form? 
