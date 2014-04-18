@@ -40,10 +40,55 @@ class PostsControllerTest extends CakeTestCase {
 			'return' => 'vars' 
 		));
 		// Assert post count
-		$this->assertEqual(count($result['posts']), 10);
+		$this->assertEqual(count($result['posts']), 4);
 		$postIds = Set::extract('/Post/id', $result['posts']);
 		// Assert post ids
-		$this->assertEqual($postIds, array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+		$this->assertEqual($postIds, array(1, 2, 3, 4));
+		
+		// Check data in page 2
+		$result = $this->testAction ('/posts/index/page:2', array(
+				'return' => 'vars'
+		));
+		// Assert post count
+		$this->assertEqual(count($result['posts']), 4);
+		$postIds = Set::extract('/Post/id', $result['posts']);
+		// Assert post ids
+		$this->assertEqual($postIds, array(5, 6, 7, 8));
+		
+		// Check data in page 3
+		$result = $this->testAction ('/posts/index/page:3', array(
+				'return' => 'vars'
+		));
+		// Assert post count
+		$this->assertEqual(count($result['posts']), 2);
+		$postIds = Set::extract('/Post/id', $result['posts']);
+		// Assert post ids
+		$this->assertEqual($postIds, array(9, 10));
+		
+		// check search data with id = 1
+		$data = array('Post' => array (
+				'keyword' => 1
+		));
+		$result = $this->testAction ('/posts', array (
+				'return' => 'vars',
+				'data' => $data,
+				'method' => 'post'
+		));
+		$this->assertEqual(count($result['posts']), 1);
+		$this->assertEqual($result['posts'][0]['Post']['title'], "First Article");
+		
+		// check search data with title like %seventh%
+		$data = array('Post' => array (
+				'keyword' => 'seventh'
+		));
+		$result = $this->testAction ('/posts', array (
+				'return' => 'vars',
+				'data' => $data,
+				'method' => 'post'
+		));
+		$this->assertEqual(count($result['posts']), 1);
+		$this->assertEqual($result['posts'][0]['Post']['id'], 7);
+		$this->assertEqual($result['posts'][0]['Post']['title'], "seventh Article");
 	}
 	
 	function testView() {

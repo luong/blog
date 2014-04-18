@@ -2,9 +2,33 @@
 class PostsController extends AppController {
     var $name = 'Posts';
     var $components = array('Session');
-
+    var $paginate = array();
+    
     function index() {
-        $this->set('posts', $this->Post->find('all'));
+    	$keyword = $this->data["Post"]["keyword"];
+    	if($keyword == "") {
+    		$this->paginate = array(
+		    		'fields' => array('Post.id', 'Post.title', 'Post.Created'),
+		    		'limit' => 4,
+		    		'order' => array(
+		    				'Post.id' => 'asc'
+		    		)
+		    );
+    	}
+    	else {
+    		$this->paginate = array(
+    				'fields' => array('Post.id', 'Post.title', 'Post.Created'),
+    				'conditions' => array (
+					        'OR' => array(
+					            "id"=> $keyword,
+					            'title LIKE' => '%'.$keyword.'%'
+					)
+    			)
+    		);
+    	}	
+    	    	
+    	$data = $this->paginate("Post");
+    	$this->set('posts', $data);
     }
 
     function view($id) {
