@@ -47,7 +47,6 @@
 			<?php echo $this->Paginator->numbers(array('class' => 'page active')); ?>
 			<?php echo $this->Paginator->prev('« Previous', null, null, array('class' => 'disable')); ?>
 			<?php echo $this->Paginator->next('Next »', null, null, array('class' => 'disable')); ?>
-
 		</div>
 	</div>
 </form>
