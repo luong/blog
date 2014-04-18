@@ -3,9 +3,19 @@ App::import('Controller', 'Posts');
 
 class TestPostsController extends PostsController {
     var $name = 'Posts';
-    
+ 
+    var $autoRender = false;
+ 
     function redirect($url, $status = null, $exit = true) {
         $this->redirectUrl = $url;
+    }
+ 
+    function render($action = null, $layout = null, $file = null) {
+        $this->renderedAction = $action;
+    }
+ 
+    function _stop($status = 0) {
+        $this->stopped = $status;
     }
 }
 
@@ -15,99 +25,133 @@ class PostsControllerTest extends CakeTestCase {
 	function startTest() {
 		$this->Posts = new TestPostsController();
 		$this->Posts->constructClasses();
+		$this->Posts->beforeFilter();
 		$this->Posts->Component->initialize($this->Posts);
 	}
 
 	function endTest() {
+		$this->Posts->Session->destroy();
 		unset($this->Posts);
 		ClassRegistry::flush();
 	}
 	
 	function testIndex() {
 		$result = $this->testAction ('/posts', array(
-				'return' => 'vars' 
-		) );
-		
-		// Check number of posts in index
-		$this->assertEqual (count($result['posts']), 10);
-		$result = Set::extract($result, 'posts.{n}.Post.id');
-		// Check match array of id of index and expected array of id
-		$this->assertEqual ($result, array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10) );
+			'return' => 'vars' 
+		));
+		// Assert post count
+		$this->assertEqual(count($result['posts']), 10);
+		$postIds = Set::extract('/Post/id', $result['posts']);
+		// Assert post ids
+		$this->assertEqual($postIds, array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 	}
 	
 	function testView() {
-		// Test post which have id = 3  
-		$result = $this->testAction ('/posts/view/3', array(
-				'return' => 'vars' 
-		) );
+		// Assert the third post
+		$result = $this->testAction('/posts/view/3', array(
+			'return' => 'vars' 
+		));
 		$this->assertEqual($result['post']['Post']['title'], 'Third Article');
 		$this->assertEqual($result['post']['Post']['body'], 'Third Article Body');
-		
-		// Test post which have id = 5
-		$result = $this->testAction ( '/posts/view/5', array (
-				'return' => 'vars'
-		) );
+		// Assert the fifth post
+		$result = $this->testAction ('/posts/view/5', array (
+			'return' => 'vars'
+		));
 		$this->assertEqual($result['post']['Post']['title'], 'fifth Article');
 		$this->assertEqual($result['post']['Post']['body'], 'fifth Article Body');
+		// Assert invalid post
+		$result = $this->testAction ('/posts/view/101', array (
+			'return' => 'vars'
+		));
+		$this->assertFalse($result['post']);
 	}
 	
+	
 	function testAdd() {
-		$this->Posts->data = array (
-				'Post' => array (
-						'id' => 11,
-						'title' => 'eleventh Article',
-						'body' => 'eleventh Article Body',
-						'created' => '2007-03-18 10:43:23',
-						'modified' => '2007-03-18 10:45:31' 
-				)
-		);
-
 		$this->Posts->params = Router::parse('/posts/add');
-		$this->Posts->beforeFilter();
-		$this->Posts->Component->startup($this->Posts);
+		// Assert successfully added
+		$this->Posts->data = array('Post' => array (
+			'id' => 11,
+			'title' => 'eleventh Article',
+			'body' => 'eleventh Article Body',
+			'created' => '2007-03-18 10:43:23',
+			'modified' => '2007-03-18 10:45:31'
+		));
 		$this->Posts->add();
-		
-		//assert the record was changed
-		$result = $this->Posts->Post->find('all');
-		$this->assertEqual(count($result), 11);
-		$this->assertEqual($result[10]['Post']['title'], 'eleventh Article');
-		$this->assertEqual($result[10]['Post']['body'], 'eleventh Article Body');
+		$post = $this->Posts->Post->findById(11);
+		$this->assertEqual($post['Post']['title'], 'eleventh Article');
+		$this->assertEqual($post['Post']['body'], 'eleventh Article Body');
+		$this->assertEqual($this->Posts->Session->read('Message.flash.message'), 'Your post has been saved.');
+		$this->assertEqual($this->Posts->redirectUrl, array('action' => 'index'));
+		// Assert validation with title required
+		$this->Posts->data = array('Post' => array (
+			'id' => 12,
+			'title' => '',
+			'body' => 'eleventh Article Body',
+			'created' => '2007-03-18 10:43:23',
+			'modified' => '2007-03-18 10:45:31'
+		));
+		$this->Posts->add();
+		$this->assertTrue(isset($this->Posts->Post->validationErrors['title']));
+		// Assert validation with body required
+		$this->Posts->data = array('Post' => array (
+			'id' => 12,
+			'title' => 'eleventh Article',
+			'body' => '',
+			'created' => '2007-03-18 10:43:23',
+			'modified' => '2007-03-18 10:45:31'
+		));
+		$this->Posts->add();
+		$this->assertTrue(isset($this->Posts->Post->validationErrors['body']));
 	}
-		
+	
 	function testDelete() {
-		$result = $this->testAction ('/posts', array(
-				'return' => 'vars'
-		) );
-		// check number of post before delete
-		$this->assertEqual (count($result['posts']), 10);
-		
+		$this->assertEqual($this->Posts->Post->find('count'), 10);
 		$this->Posts->params = Router::parse('/posts/delete');
-		$this->Posts->beforeFilter();
-		$this->Posts->Component->startup($this->Posts);
+		// Assert failed case
+		$this->Posts->delete(101);
+		$this->assertEqual($this->Posts->Post->find('count'), 10);
+		// Assert successful case
 		$this->Posts->delete(10);
-		// check number of post after delete
-		$result = $this->Posts->Post->find('all');
-		$this->assertEqual(count($result), 9);
+		$this->assertEqual($this->Posts->Post->find('count'), 9);
+		$this->assertEqual($this->Posts->Session->read('Message.flash.message'), 'The post with id: 10 has been deleted.');
+		$this->assertEqual($this->Posts->redirectUrl, array('action' => 'index'));
 	}
 
 	function testEdit() {
 		$this->Posts->data = array(
-				'Post' => array(
-						'id' => 5,
-						'title' => 'edit title 5',
-						'body' => 'edit body 5' 
-				) 
+			'Post' => array(
+				'id' => 5,
+				'title' => 'edit title 5',
+				'body' => 'edit body 5' 
+			) 
 		);
-		
 		$this->Posts->params = Router::parse('/posts/edit');
-		$this->Posts->beforeFilter();
-		$this->Posts->Component->startup($this->Posts);
 		$this->Posts->edit();
-		
-		//assert the record was changed
-		$result = $this->Posts->Post->read(null,5);
-		$this->assertEqual($result['Post']['title'], 'edit title 5');
-		$this->assertEqual($result['Post']['body'], 'edit body 5');
+		// Assert successfully updated
+		$post = $this->Posts->Post->read(null, 5);
+		$this->assertEqual($post['Post']['title'], 'edit title 5');
+		$this->assertEqual($post['Post']['body'], 'edit body 5');
+		$this->assertEqual($this->Posts->Session->read('Message.flash.message'), 'Your post has been updated.');
+		$this->assertEqual($this->Posts->redirectUrl, array('action' => 'index'));
+		// Assert validation with title required
+		$this->Posts->data = array('Post' => array (
+			'id' => 5,
+			'title' => '',
+			'body' => 'edit body 5' 
+		));
+		$this->Posts->edit();
+		$this->assertTrue(isset($this->Posts->Post->validationErrors['title']));
+		// Assert validation with body required
+		$this->Posts->data = array(
+			'Post' => array(
+				'id' => 5,
+				'title' => 'edit title 5',
+				'body' => '' 
+			) 
+		);
+		$this->Posts->edit();
+		$this->assertTrue(isset($this->Posts->Post->validationErrors['body']));
 	}
 }
 ?>
