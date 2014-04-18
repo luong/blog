@@ -71,10 +71,10 @@ class PostsControllerTest extends CakeTestCase {
 		));
 		$this->Posts->params = Router::parse('/posts/search');
 		$this->Posts->search();print_r($this->Posts->Post->find('all'));
-	
+		/*
 		//$this->assertEqual(count($result['posts']), 4);
 		//$this->assertEqual($result['posts'][0]['Post']['title'], "First Article");	
-		/*	
+			
 		// check search data with title like %seventh%
 		$data = array('Post' => array (
 				'keyword' => 'seventh'

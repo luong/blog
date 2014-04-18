@@ -4,7 +4,7 @@
 <h1>Blog posts</h1>
 <p><?php echo $this->Html->link("Add Post", array('action' => 'add')); ?></p>
 
-<?php $this->Paginator->options(array('url' => $this->passedArgs));?>
+<?php $this->Paginator->options(array('url' => $this->passedArgs)); ?>
 
 <?php 
 echo $this->Form->create('Post',array('action'=>'search'));

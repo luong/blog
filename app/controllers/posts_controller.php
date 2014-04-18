@@ -6,7 +6,6 @@ class PostsController extends AppController {
     
     function index() {
     	$conditions = array();
-
     	if(isset($this->passedArgs['Post.keyword'])) {
             $keyword = $this->passedArgs['Post.keyword'];
             $conditions[] = array (
@@ -22,21 +21,18 @@ class PostsController extends AppController {
         		'limit' => 4,
         		'order' => array('Post.id' => 'asc'),
         );
-
         $this->set("posts",$this->paginate("Post",$conditions));
     }
 
 	function search() {
         // the page we will redirect to
-        $url['action'] = 'index';
-        
+        $url['action'] = 'index';     
         // build a URL will all the search elements in it
         foreach ($this->data as $k=>$v){ 
             foreach ($v as $kk=>$vv){ 
                 $url[$k.'.'.$kk]=$vv; 
             } 
         }
-        
         // redirect the user to the url
         $this->redirect($url, null, true);
     }  
