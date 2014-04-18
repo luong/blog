@@ -42,11 +42,12 @@
 	    </tr>
 	    <?php endforeach; ?>
 	</table>
-	<div id="container">
-		<div class="pagination">
-			<?php echo $this->Paginator->numbers(array('class' => 'page')); ?>
-			<?php echo $this->Paginator->prev('« Previous', array('class' => 'page active'), null, array('class' => 'disable')); ?>
-			<?php echo $this->Paginator->next('Next »', array('class' => 'page active'), null, array('class' => 'disable')); ?>
-		</div>
+	<input type="hidden" name="data[Post][flag]" value="">
+
+	<div class="pagination">
+		<?php echo $this->Paginator->numbers(array('currentClass' => 'page')); ?>
+		<?php echo $this->Paginator->prev('« Previous', null, null, array('class' => 'page active')); ?>
+		<?php echo $this->Paginator->next('Next »', null, null, array('class' => 'page active')); ?>
 	</div>
+
 </form>
