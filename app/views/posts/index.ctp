@@ -41,6 +41,6 @@ echo $this->Form->end();
 <div class="pagination">
 	<?php $this->Paginator->options(array('url' => $this->passedArgs));?>
 	<?php echo $this->Paginator->numbers(array('class' => 'page')); ?>
-	<?php echo $this->Paginator->prev('« Previous', null, null, array('class' => 'page active')); ?>
+	<?php echo $this->Paginator->prev('« Previous', null, null, array('class' => 'disable')); ?>
 	<?php echo $this->Paginator->next('Next »', null, null, array('class' => 'disable')); ?>
 </div>
