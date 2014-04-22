@@ -1,13 +1,13 @@
-<!-- File: /app/views/posts/index.ctp  (edit links added) -->
-<?php $this->Html->css('style', null, array('inline' => false));?>
+<?php
+	$this->Html->script('posts/index', array('inline' => false));
+	$this->Paginator->options(array('url' => $this->passedArgs));
+?>
 
 <h1>Blog posts</h1>
 <p><?php echo $this->Html->link("Add Post", array('action' => 'add')); ?></p>
 
-<?php $this->Paginator->options(array('url' => $this->passedArgs)); ?>
-
 <?php 
-echo $this->Form->create('Post',array('action'=>'search'));
+echo $this->Form->create('Post');
 echo $this->Form->input('keyword');
 echo $this->Form->submit('Search');
 echo $this->Form->end();
@@ -17,7 +17,7 @@ echo $this->Form->end();
 	<tr>
 		<th><?php echo $this->Paginator->sort('ID', 'id'); ?></th>
 		<th><?php echo $this->Paginator->sort('Title', 'title'); ?></th>
-	    <th><?php echo $this->Paginator->sort('Action', ''); ?></th>
+	    <th>Action</th>
 	    <th><?php echo $this->Paginator->sort('Created', 'created'); ?></th>
 	</tr>
 	    <?php foreach($posts as $post): ?>
@@ -41,6 +41,6 @@ echo $this->Form->end();
 <div class="pagination">
 	<?php $this->Paginator->options(array('url' => $this->passedArgs));?>
 	<?php echo $this->Paginator->numbers(array('class' => 'page')); ?>
-	<?php echo $this->Paginator->prev('« Previous', null, null, array('class' => 'disable')); ?>
-	<?php echo $this->Paginator->next('Next »', null, null, array('class' => 'disable')); ?>
+	<?php echo $this->Paginator->prev('<< Previous', null, null, array('class' => 'disable')); ?>
+	<?php echo $this->Paginator->next('Next >>', null, null, array('class' => 'disable')); ?>
 </div>

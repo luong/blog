@@ -1,8 +1,4 @@
 <!-- File: /app/views/posts/edit.ctp -->
-<?php 
-echo $this->Html->css(array('style','chosen'), null, array('inline' => false));?>
-<?php echo $this->Html->script(array('jquery', 'chosen.jquery'));?>
-
 <script type="text/javascript">
 $(document).ready(function(){
 	$(".chosen").chosen();
@@ -16,13 +12,12 @@ $(document).ready(function(){
     echo $this->Form->input('body', array('rows' => '3'));
     echo $this->Form->input('id', array('type' => 'hidden'));
 ?>
-<select class="chosen" name="data[Post][tag][]" multiple="true" style="width:400px;">
-	<?php $selected = explode(',', $selectedTags['PostTag']['tag_id']);?>
+<select class="chosen" name="data[Tag][]" multiple="true" style="width:400px;">
 	<?php foreach($tags as $tag): ?>
  			<option value="<?php echo $tag['Tag']['id'];?>"
  				<?php 
- 					for($i=0;$i<count($selected);$i++){
-						if($tag['Tag']['id'] == $selected[$i]){
+ 					foreach ($this->data['Tag'] as $selectedTags){
+						if($tag['Tag']['id'] == $selectedTags['id']){
 							echo "Selected";
 							break;
 						}	
