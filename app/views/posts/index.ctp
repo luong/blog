@@ -2,7 +2,7 @@
 	$this->Html->script('posts/index', array('inline' => false));
 	$this->Paginator->options(array('url' => $this->passedArgs));
 ?>
-
+<?php echo $this->Html->link("Log out", array('controller' => 'Users', 'action' => 'logout')); ?>
 <h1>Blog posts</h1>
 <p><?php echo $this->Html->link("Add Post", array('action' => 'add')); ?></p>
 

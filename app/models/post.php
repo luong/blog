@@ -10,7 +10,13 @@ class Post extends AppModel {
 					'foreignKey' => 'post_id',
 					'associationForeignKey' => 'tag_id'
 		));
-
+    /*
+    var $belongsTo = array(
+    		'User' => array(
+    				'className' => 'User',
+    				'foreignKey' => 'user_id'
+    	));
+    */
     var $validate = array(
     		'title' => array(
     				'rule' => 'notEmpty'

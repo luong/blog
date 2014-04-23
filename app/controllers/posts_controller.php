@@ -6,7 +6,7 @@ class PostsController extends AppController {
     var $paginate = array();
     
     function index() {
-    	$conditions = array();
+    	$conditions[] = array('Post.user_id' => $this->Session->read('Auth.User.id'));
     	$keyword = '';
     	if (!empty($this->params['named']['keyword'])) {
             $keyword = $this->params['named']['keyword'];
@@ -34,8 +34,7 @@ class PostsController extends AppController {
 
     function add() {
     	// get all tags in tags table to use for view
-    	$this->set('tags', $this->Tag->find('all'));
-    	
+    	$this->set('tags', $this->Tag->find('all'));	
         if (!empty($this->data)) {
             if ($this->Post->saveAll($this->data)) {
                 $this->Session->setFlash('Your post has been saved.');

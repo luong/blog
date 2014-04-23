@@ -18,6 +18,7 @@ echo $this->Form->input('body', array('rows' => '3'));
  		endforeach;
  	?>
 </select>
+<input type='hidden' name='data[Post][user_id]' value='<?php echo $this->Session->read('Auth.User.id');?>' >
 <?php
 echo $this->Form->end('Save Post');
 ?>
