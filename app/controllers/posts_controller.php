@@ -44,7 +44,7 @@ class PostsController extends AppController {
     }
     
     function delete($id) {
-    	if ($this->Post->delete($id)) {
+    	if ($this->Post->delete($id, true)) {
     		$this->Session->setFlash('The post with id: ' . $id . ' has been deleted.');
     		$this->redirect(array('action' => 'index'));
     	}
@@ -56,9 +56,15 @@ class PostsController extends AppController {
 
     	$this->Post->id = $id;
     	if (empty($this->data)) {
-    		$this->data = $this->Post->read();
+    		$this->data = $this->Post->read();//debug($this->data);
     	} else {
-    		if ($this->Post->saveAll($this->data)) {
+    		//if($this->Post->saveAll($this->data)) {
+    		$this->Post->set($this->data);
+    		if ($this->Post->validates()) {
+    			$this->PostsTag->deleteAll(array(
+						"PostsTag.post_id" => $id
+				));
+    			$this->Post->saveAll($this->data);
     			$this->Session->setFlash('Your post has been updated.');
     			$this->redirect(array('action' => 'index'));
     		}
