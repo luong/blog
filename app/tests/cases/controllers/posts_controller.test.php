@@ -40,7 +40,7 @@ class PostsControllerTest extends CakeTestCase {
 		// write session for authentication
 		$this->Posts->Session->write('Auth.User', array(
 				'id' => 1,
-				'username' => 'user1111',
+				'username' => EMAIL_FOR_AUTH,
 		));
 		
 		$result = $this->testAction ('/posts', array(
@@ -62,7 +62,7 @@ class PostsControllerTest extends CakeTestCase {
 		// Assert post ids
 		$this->assertEqual($postIds, array(5));
 		
-		// check search data with id = 1
+		// check search data with keyword = first
 		$result = $this->testAction ('/posts/index/keyword:First', array (
 				'return' => 'vars'
 		));
@@ -71,12 +71,12 @@ class PostsControllerTest extends CakeTestCase {
 		$this->assertEqual($result['posts'][0]['Post']['title'], 'First Article');
 		$this->assertEqual($result['posts'][0]['Post']['body'], 'First Article Body');
 	}
-	
+
 	function testView() {
 		// write session for authentication
 		$this->Posts->Session->write('Auth.User', array(
 				'id' => 1,
-				'username' => 'user1111',
+				'username' => EMAIL_FOR_AUTH,
 		));
 		// Assert the third post
 		$result = $this->testAction('/posts/view/3', array(
@@ -97,12 +97,11 @@ class PostsControllerTest extends CakeTestCase {
 		$this->assertFalse($result['post']);
 	}
 	
-	
 	function testAdd() {
 		// write session for authentication
 		$this->Posts->Session->write('Auth.User', array(
 				'id' => 1,
-				'username' => 'user1111',
+				'username' => EMAIL_FOR_AUTH,
 		));
 		
 		$this->Posts->params = Router::parse('/posts/add');
@@ -115,17 +114,27 @@ class PostsControllerTest extends CakeTestCase {
 				'created' => '2007-03-18 10:43:23',
 				'modified' => '2007-03-18 10:45:31'
 			),
-			'Tag' => array (1, 2, 3)
+			'PostsTag' => Array(
+            		'0' => Array(
+                    	'tag_id' => 1
+                	),
+					'1' => Array(
+						'tag_id' => 2
+					),
+					'2' => Array(
+						'tag_id' => 3
+					)
+        	)
 		);
 		$this->Posts->add();
 		$post = $this->Posts->Post->findById(11);
 		$this->assertEqual($post['Post']['title'], 'eleventh Article');
 		$this->assertEqual($post['Post']['body'], 'eleventh Article Body');
 		$this->assertEqual($post['Post']['user_id'], 1);
-		// get tags id
-		$postIds = Set::extract($post, 'Tag.{n}.id');
-		$this->assertEqual(count($post['Tag']), 3);
-		$this->assertEqual($postIds, array(1, 2, 3));
+		// get tag_ids from posts_tags
+		$tagIds = Set::extract($post, 'PostsTag.{n}.tag_id');
+		$this->assertEqual(count($post['PostsTag']), 3);
+		$this->assertEqual($tagIds, array(1, 2, 3));
 		$this->assertEqual($this->Posts->Session->read('Message.flash.message'), 'Your post has been saved.');
 		$this->assertEqual($this->Posts->redirectUrl, array('action' => 'index'));
 		// Assert validation with title required
@@ -136,8 +145,7 @@ class PostsControllerTest extends CakeTestCase {
 				'body' => 'eleventh Article Body',
 				'created' => '2007-03-18 10:43:23',
 				'modified' => '2007-03-18 10:45:31'
-			),
-			'Tag' => array (1, 2, 3)
+			)
 		);
 		$this->Posts->add();
 		$this->assertTrue(isset($this->Posts->Post->validationErrors['title']));
@@ -149,8 +157,7 @@ class PostsControllerTest extends CakeTestCase {
 				'body' => '',
 				'created' => '2007-03-18 10:43:23',
 				'modified' => '2007-03-18 10:45:31'
-			),
-			'Tag' => array (1, 2, 3)
+			)
 		);
 		$this->Posts->add();
 		$this->assertTrue(isset($this->Posts->Post->validationErrors['body']));
@@ -160,24 +167,28 @@ class PostsControllerTest extends CakeTestCase {
 		// write session for authentication
 		$this->Posts->Session->write('Auth.User', array(
 				'id' => 1,
-				'username' => 'user1111',
+				'username' => EMAIL_FOR_AUTH,
 		));
-		
+		// check info of post which have id equal 1 before delete
 		$this->assertEqual($this->Posts->Post->find('count', array('conditions' => array(
-								'user_id' => '1'
+								'user_id' => 1
 					))), 5);
+		$this->assertEqual($this->Posts->PostsTag->find('count'), 5);
+		
 		$this->Posts->params = Router::parse('/posts/delete');
 		// Assert failed case
 		$this->Posts->delete(101);
 		$this->assertEqual($this->Posts->Post->find('count', array('conditions' => array(
-								'user_id' => '1'
+								'user_id' => 1
 					))), 5);
+		$this->assertEqual($this->Posts->PostsTag->find('count'), 5);
 		// Assert successful case
-		$this->Posts->delete(5);
+		$this->Posts->delete(1);
 		$this->assertEqual($this->Posts->Post->find('count', array('conditions' => array(
-								'user_id' => '1'
+								'user_id' => 1
 					))), 4);
-		$this->assertEqual($this->Posts->Session->read('Message.flash.message'), 'The post with id: 5 has been deleted.');
+		$this->assertEqual($this->Posts->PostsTag->find('count'), 2);
+		$this->assertEqual($this->Posts->Session->read('Message.flash.message'), 'The post with id: 1 has been deleted.');
 		$this->assertEqual($this->Posts->redirectUrl, array('action' => 'index'));
 	}
 
@@ -185,27 +196,44 @@ class PostsControllerTest extends CakeTestCase {
 		// write session for authentication
 		$this->Posts->Session->write('Auth.User', array(
 				'id' => 1,
-				'username' => 'user1111',
+				'username' => EMAIL_FOR_AUTH,
 		));
+		// check info of post which have id equal 1 before edit
+		$post = $this->Posts->Post->read(null, 1);
+		$this->assertEqual($post['Post']['title'], 'First Article');
+		$this->assertEqual($post['Post']['body'], 'First Article Body');
+		$tagIds = Set::extract($post, 'PostsTag.{n}.tag_id');
+		$this->assertEqual(count($post['PostsTag']), 3);
+		$this->assertEqual($tagIds, array(1, 2, 3));
 		
 		$this->Posts->data = array(
 			'Post' => array(
-				'id' => 5,
-				'title' => 'edit title 5',
-				'body' => 'edit body 5'
+				'id' => 1,
+				'title' => 'edit title 1',
+				'body' => 'edit body 1'
 			),
-			'Tag' => array (2, 3, 5)
+			'PostsTag' => Array(
+            		'0' => Array(
+                    	'tag_id' => 1
+                	),
+					'1' => Array(
+						'tag_id' => 2
+					),
+					'2' => Array(
+						'tag_id' => 5
+					)
+        	)
 		);
 		$this->Posts->params = Router::parse('/posts/edit');
-		$this->Posts->edit();
+		$this->Posts->edit(1);
 		// Assert successfully updated
-		$post = $this->Posts->Post->read(null, 5);
-		$this->assertEqual($post['Post']['title'], 'edit title 5');
-		$this->assertEqual($post['Post']['body'], 'edit body 5');
-		// get tags id
-		$postIds = Set::extract($post, 'Tag.{n}.id');
-		$this->assertEqual(count($post['Tag']), 3);
-		$this->assertEqual($postIds, array(2, 3, 5));
+		$post = $this->Posts->Post->read(null, 1);
+		$this->assertEqual($post['Post']['title'], 'edit title 1');
+		$this->assertEqual($post['Post']['body'], 'edit body 1');
+		// get tag_ids from posts_tags
+		$tagIds = Set::extract($post, 'PostsTag.{n}.tag_id');
+		$this->assertEqual(count($post['PostsTag']), 3);
+		$this->assertEqual($tagIds, array(1, 2, 5));
 		$this->assertEqual($this->Posts->Session->read('Message.flash.message'), 'Your post has been updated.');
 		$this->assertEqual($this->Posts->redirectUrl, array('action' => 'index'));
 		// Assert validation with title required
@@ -213,10 +241,9 @@ class PostsControllerTest extends CakeTestCase {
 				'id' => 5,
 				'title' => '',
 				'body' => 'edit body 5'
-			),
-			'Tag' => array(1, 3, 5)
+			)
 		);
-		$this->Posts->edit();
+		$this->Posts->edit(5);
 		$this->assertTrue(isset($this->Posts->Post->validationErrors['title']));
 		// Assert validation with body required
 		$this->Posts->data = array(
@@ -224,10 +251,9 @@ class PostsControllerTest extends CakeTestCase {
 				'id' => 5,
 				'title' => 'edit title 5',
 				'body' => ''
-			),
-			'Tag' => array(1, 2, 3)
+			)
 		);
-		$this->Posts->edit();
+		$this->Posts->edit(5);
 		$this->assertTrue(isset($this->Posts->Post->validationErrors['body']));
 	}
 }

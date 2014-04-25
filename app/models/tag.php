@@ -2,6 +2,7 @@
 
 class Tag extends AppModel {
     var $name = 'Tag';
+    var $actsAs = array('Containable');
     
     var $hasMany = array(
     		'PostsTag' => array(

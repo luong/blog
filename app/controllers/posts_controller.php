@@ -44,30 +44,41 @@ class PostsController extends AppController {
     }
     
     function delete($id) {
-    	if ($this->Post->delete($id, true)) {
-    		$this->Session->setFlash('The post with id: ' . $id . ' has been deleted.');
-    		$this->redirect(array('action' => 'index'));
-    	}
+    	$data = $this->Post->findById($id);
+    	if($data['Post']['user_id'] == $this->Session->read('Auth.User.id')) {
+	    	if ($this->Post->delete($id, true)) {
+	    		$this->Session->setFlash('The post with id: ' . $id . ' has been deleted.');
+	    	}
+    	} 
+    	else 
+    		$this->Session->setFlash('Delete fail.');
+    	$this->redirect(array('action' => 'index'));
     }
     
     function edit($id = null) {
-    	// get all tags in tags table to use for view
-    	$this->set('tags', $this->Tag->find('all'));
-
-    	$this->Post->id = $id;
-    	if (empty($this->data)) {
-    		$this->data = $this->Post->read();//debug($this->data);
-    	} else {
-    		//if($this->Post->saveAll($this->data)) {
-    		$this->Post->set($this->data);
-    		if ($this->Post->validates()) {
-    			$this->PostsTag->deleteAll(array(
-						"PostsTag.post_id" => $id
-				));
-    			$this->Post->saveAll($this->data);
-    			$this->Session->setFlash('Your post has been updated.');
-    			$this->redirect(array('action' => 'index'));
-    		}
+    	$data = $this->Post->findById($id);
+    	if($data['Post']['user_id'] == $this->Session->read('Auth.User.id')) {
+	    	// get all tags in tags table to use for view
+	    	$this->set('tags', $this->Tag->find('all'));
+	
+	    	$this->Post->id = $id;
+	    	if (empty($this->data)) {
+	    		$this->data = $this->Post->read();
+	    	} else {
+	    		$this->Post->set($this->data);
+	    		if ($this->Post->validates()) {
+	    			$this->PostsTag->deleteAll(array(
+							"PostsTag.post_id" => $id
+					));
+	    			$this->Post->saveAll($this->data);
+	    			$this->Session->setFlash('Your post has been updated.');
+	    			$this->redirect(array('action' => 'index'));
+	    		}
+	    	}
+    	}
+    	else {
+    		$this->Session->setFlash('Update fail.');
+    		$this->redirect(array('action' => 'index'));
     	}
     }
 }

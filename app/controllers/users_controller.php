@@ -16,7 +16,7 @@ class UsersController extends AppController {
     		$this->data['User']['password'] = $this->Auth->password($this->data['User']['tmp_password']);
     		if ($this->User->save($this->data)) {
     			$email = $this->data['User']['email'];
-    			$urlActive = 'http://test/'.str_replace('register', 'active/h:', Router::url()).$tokenHash.'/i:'.$this->User->id;
+    			$urlActive = Configure::read('app.url').str_replace('register', 'active/', Router::url()).$tokenHash.'/'.$this->User->id;
     			// send email which contain register info and active url
     			$this->email($this->data['User']['email'], $urlActive);
     			$this->Session->setFlash('Register successfully.');
@@ -25,10 +25,8 @@ class UsersController extends AppController {
 		}
     }
     
-    function active($username){
-    	if (!empty($this->passedArgs['h']) && !empty($this->passedArgs['i'])) {
-    		$id = $this->passedArgs['i'];
-    		$tokenHash = $this->passedArgs['h'];
+    function active($tokenHash, $id){
+    	if (!empty($tokenHash) && !empty($id)) {
     		$results = $this->User->findById($id);
     		if ($results['User']['active'] == 0) {
     			if ($results['User']['token_hash'] == $tokenHash) {
@@ -40,15 +38,20 @@ class UsersController extends AppController {
     				$this->Session->setFlash('Your registration is complete');
     				$this->redirect(array('action' => 'login'));
     			}
-    			else 
+    			else {
     				$this->Session->setFlash('Your registration failed please try again');
+    				$this->redirect(array('action' => 'register'));
+    			}
     		}
-    		else 
+    		else {
     			$this->Session->setFlash('Token has alredy been used');
+    			$this->redirect(array('action' => 'register'));
+    		}
     	}    
-    	else 
+    	else {
     		$this->Session->setFlash('Token corrupted. Please re-register');
-    	$this->redirect(array('action' => 'register'));
+    		$this->redirect(array('action' => 'register'));
+    	}
     }
 
 	function login() {

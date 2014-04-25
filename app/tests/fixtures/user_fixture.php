@@ -6,23 +6,34 @@ class UserFixture extends CakeTestFixture {
 	var $records = array (
 			array (
 					'id' => 1,
-					'username' => 'user1111',
-					'email' => 'tran.thanh.son.gsc@gmail.com',
-					'password' => '123456',
+					'email' => EMAIL_FOR_AUTH,
+					'password' => 'e20942c3cff85f77346d865785b5763363292794',
 					'firstname' => 'nick',
 					'lastname' => 'bamby',
 					'active' => 1,
+					'token_hash' => 'd98214490ec4d06b9ac52444ea2574db82f7e49a',
 					'created' => '2007-03-18 10:41:23',
 					'modified' => '2007-03-18 10:43:31'
 			),
 			array (
 					'id' => 2,
-					'username' => 'user2222',
-					'email' => 'tran.thanh.son.gsc@gmail.com',
-					'password' => '123456',
+					'email' => 'tran.thanh.son@gmail.com',
+					'password' => 'e20942c3cff85f77346d865785b5763363292794',
 					'firstname' => 'nick',
 					'lastname' => 'bamby',
 					'active' => 0,
+					'token_hash' => 'd98214490ec4d06b9ac52444ea2574db82f7e49a',
+					'created' => '2007-03-18 10:41:23',
+					'modified' => '2007-03-18 10:43:31'
+			),
+			array (
+					'id' => 3,
+					'email' => 'tran.thanh.son1111@gmail.com',
+					'password' => 'e20942c3cff85f77346d865785b5763363292794',
+					'firstname' => 'nick',
+					'lastname' => 'bamby',
+					'active' => 0,
+					'token_hash' => 'd98214490ec4d06b9ac52444ea2574db82f7e49a',
 					'created' => '2007-03-18 10:41:23',
 					'modified' => '2007-03-18 10:43:31'
 			)

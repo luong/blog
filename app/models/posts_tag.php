@@ -2,6 +2,7 @@
 
 class PostsTag extends AppModel {
     var $name = 'PostsTag';
+    var $actsAs = array('Containable');
     
     var $belongsTo = array(
     		'Post' => array(
