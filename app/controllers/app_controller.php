@@ -7,7 +7,7 @@ class AppController extends Controller {
 		$this->Auth->fields = array('username' => 'email', 'password' => 'password');
 		$this->Auth->userScope = array('User.active' => 1);
         $this->Auth->loginAction = array('controller'=>'users','action'=>'login');
-        $this->Auth->loginRedirect = array('controller'=>'posts','action'=>'index');
+        $this->Auth->loginRedirect = array('controller'=>'Posts','action'=>'index');
         $this->Auth->loginError = 'Failed to login';
         $this->Auth->authError = 'Access denied';       
     }

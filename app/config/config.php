@@ -12,3 +12,5 @@ $config['app']['password'] = '10279271';
 // Test info
 define('EMAIL_FOR_AUTH', 'tran.thanh.son.gsc@gmail.com');
 define('EMAIL_FOR_TEST_REGISTER_USER', 'sontt10279271@gmail.com');
+define('ADMIN_USERNAME', 'thanhson');
+define('ADMIN_PASSWORD', '123456');

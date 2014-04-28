@@ -1,5 +1,5 @@
 <?php 
-/* App schema generated on: 2014-04-24 13:21:57 : 1398338517*/
+/* App schema generated on: 2014-04-28 13:11:16 : 1398683476*/
 class AppSchema extends CakeSchema {
 	var $name = 'App';
 
@@ -10,6 +10,12 @@ class AppSchema extends CakeSchema {
 	function after($event = array()) {
 	}
 
+	var $admins = array(
+		'username' => array('type' => 'string', 'null' => false, 'default' => NULL, 'length' => 20, 'key' => 'primary', 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
+		'password' => array('type' => 'string', 'null' => false, 'default' => NULL, 'length' => 50, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
+		'indexes' => array('PRIMARY' => array('column' => 'username', 'unique' => 1)),
+		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_general_ci', 'engine' => 'InnoDB')
+	);
 	var $posts = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'length' => 10, 'key' => 'primary'),
 		'user_id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'length' => 10),

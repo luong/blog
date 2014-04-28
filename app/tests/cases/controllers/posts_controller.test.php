@@ -169,6 +169,7 @@ class PostsControllerTest extends CakeTestCase {
 				'id' => 1,
 				'username' => EMAIL_FOR_AUTH,
 		));
+		
 		// check info of post which have id equal 1 before delete
 		$this->assertEqual($this->Posts->Post->find('count', array('conditions' => array(
 								'user_id' => 1
@@ -176,7 +177,7 @@ class PostsControllerTest extends CakeTestCase {
 		$this->assertEqual($this->Posts->PostsTag->find('count'), 5);
 		
 		$this->Posts->params = Router::parse('/posts/delete');
-		// Assert failed case
+		// Assert failed case: id doesn't exist
 		$this->Posts->delete(101);
 		$this->assertEqual($this->Posts->Post->find('count', array('conditions' => array(
 								'user_id' => 1
@@ -190,6 +191,13 @@ class PostsControllerTest extends CakeTestCase {
 		$this->assertEqual($this->Posts->PostsTag->find('count'), 2);
 		$this->assertEqual($this->Posts->Session->read('Message.flash.message'), 'The post with id: 1 has been deleted.');
 		$this->assertEqual($this->Posts->redirectUrl, array('action' => 'index'));
+		
+		// Assert failed case: delete post which does not belong to user 
+		$this->Posts->delete(6);
+		$this->assertEqual($this->Posts->Post->find('count', array('conditions' => array(
+				'user_id' => 2
+		))), 5);
+		$this->assertEqual($this->Posts->Session->read('Message.flash.message'), 'Delete fail.');
 	}
 
 	function testEdit() {
@@ -254,6 +262,141 @@ class PostsControllerTest extends CakeTestCase {
 			)
 		);
 		$this->Posts->edit(5);
+		$this->assertTrue(isset($this->Posts->Post->validationErrors['body']));
+		
+		// Assert failed case: update post which does not belong to user
+		$this->Posts->data = array(
+				'Post' => array(
+						'id' => 6,
+						'title' => 'edit title 6',
+						'body' => 'edit body 6'
+				)
+		);
+		$this->Posts->edit(6);
+		$this->assertEqual($this->Posts->Session->read('Message.flash.message'), 'Update fail.');
+	}
+	
+	function testAdmin_managePosts() {
+		// auth admin
+		$this->Posts->Session->write('admin.username', ADMIN_USERNAME);
+		$result = $this->testAction ('/admin/Posts/managePosts', array(
+				'return' => 'vars'
+		));
+		// Assert post count
+		$this->assertEqual(count($result['posts']), 4);
+		$postIds = Set::extract($result['posts'], '{n}.Post.id');
+		// Assert post ids
+		$this->assertEqual($postIds, array(1, 2, 3, 4));
+		
+		// Check data in page 2
+		$result = $this->testAction ('/admin/Posts/managePosts/page:2', array(
+				'return' => 'vars'
+		));
+		// Assert post count
+		$this->assertEqual(count($result['posts']), 4);
+		$postIds = Set::extract($result['posts'], '{n}.Post.id');
+		// Assert post ids
+		$this->assertEqual($postIds, array(5, 6, 7, 8));
+		
+		// Check data in page 3
+		$result = $this->testAction ('/admin/Posts/managePosts/page:3', array(
+				'return' => 'vars'
+		));
+		// Assert post count
+		$this->assertEqual(count($result['posts']), 2);
+		$postIds = Set::extract($result['posts'], '{n}.Post.id');
+		// Assert post ids
+		$this->assertEqual($postIds, array(9, 10));
+		
+		// check search data with keyword = first
+		$result = $this->testAction ('/admin/Posts/managePosts/keyword:seventh', array (
+				'return' => 'vars'
+		));
+		$this->assertEqual(count($result['posts']), 1);
+		$this->assertEqual($result['posts'][0]['Post']['id'], 7);
+		$this->assertEqual($result['posts'][0]['Post']['title'], 'seventh Article');
+		$this->assertEqual($result['posts'][0]['Post']['body'], 'seventh Article Body');
+	}
+	
+	function testAdmin_delete() {
+		$this->Posts->Session->write('admin.username', ADMIN_USERNAME);
+
+		// check info of post which have id equal 1 before delete
+		$this->assertEqual($this->Posts->Post->find('count'), 10);
+		$this->assertEqual($this->Posts->PostsTag->find('count'), 5);
+		
+		$this->Posts->params = Router::parse('/admin/posts/delete');
+		// Assert failed case: id doesn't exist
+		$this->Posts->admin_delete(11);
+		$this->assertEqual($this->Posts->Post->find('count'), 10);
+		$this->assertEqual($this->Posts->PostsTag->find('count'), 5);
+		// Assert successful case
+		$this->Posts->admin_delete(1);
+		$this->assertEqual($this->Posts->Post->find('count'), 9);
+		$this->assertEqual($this->Posts->PostsTag->find('count'), 2);
+		$this->assertEqual($this->Posts->Session->read('Message.flash.message'), 'The post with id: 1 has been deleted.');
+		$this->assertEqual($this->Posts->redirectUrl, array('action' => 'admin_managePosts'));
+	}
+	
+	function testAdmin_edit() {
+		$this->Posts->Session->write('admin.username', ADMIN_USERNAME);
+	
+		// check info of post which have id equal 1 before edit
+		$post = $this->Posts->Post->read(null, 1);
+		$this->assertEqual($post['Post']['title'], 'First Article');
+		$this->assertEqual($post['Post']['body'], 'First Article Body');
+		$tagIds = Set::extract($post, 'PostsTag.{n}.tag_id');
+		$this->assertEqual(count($post['PostsTag']), 3);
+		$this->assertEqual($tagIds, array(1, 2, 3));
+		
+		$this->Posts->data = array(
+				'Post' => array(
+						'id' => 1,
+						'title' => 'edit title 1',
+						'body' => 'edit body 1'
+				),
+				'PostsTag' => Array(
+						'0' => Array(
+								'tag_id' => 1
+						),
+						'1' => Array(
+								'tag_id' => 2
+						),
+						'2' => Array(
+								'tag_id' => 5
+						)
+				)
+		);
+		$this->Posts->params = Router::parse('/admin/posts/edit');
+		$this->Posts->admin_edit(1);
+		// Assert successfully updated
+		$post = $this->Posts->Post->read(null, 1);
+		$this->assertEqual($post['Post']['title'], 'edit title 1');
+		$this->assertEqual($post['Post']['body'], 'edit body 1');
+		// get tag_ids from posts_tags
+		$tagIds = Set::extract($post, 'PostsTag.{n}.tag_id');
+		$this->assertEqual(count($post['PostsTag']), 3);
+		$this->assertEqual($tagIds, array(1, 2, 5));
+		$this->assertEqual($this->Posts->Session->read('Message.flash.message'), 'Your post has been updated.');
+		$this->assertEqual($this->Posts->redirectUrl, array('action' => 'admin_managePosts'));
+		// Assert validation with title required
+		$this->Posts->data = array('Post' => array (
+					'id' => 5,
+					'title' => '',
+					'body' => 'edit body 5'
+				)
+		);
+		$this->Posts->admin_edit(5);
+		$this->assertTrue(isset($this->Posts->Post->validationErrors['title']));
+		// Assert validation with body required
+		$this->Posts->data = array(
+				'Post' => array(
+					'id' => 5,
+					'title' => 'edit title 5',
+					'body' => ''
+				)
+		);
+		$this->Posts->admin_edit(5);
 		$this->assertTrue(isset($this->Posts->Post->validationErrors['body']));
 	}
 }

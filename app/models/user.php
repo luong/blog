@@ -11,13 +11,14 @@ class User extends AppModel {
     ));
 
     var $validate = array(
+    		'id' => array(),
     		'email' => array(
     				'emailInvalid' => array(
     						'rule' => 'email',
     						'message' => 'Email is empty or invalid'
     				),
     				'emailExists' => array(
-    						'rule' => 'checkEmailExists',
+    						'rule' => array('checkEmailExists', 'id'),
     						'message' => 'Email existed, please input other email.'
     				)
     		),
@@ -51,9 +52,10 @@ class User extends AppModel {
 	    return ($this->data[$this->name][$password] == $data['password_confirm']);
 	}
 	
-	function checkEmailExists ($data) {
-		if($this->hasAny(array('email' => $data['email'])))
-			return false;
+	function checkEmailExists ($data, $id) {
+		if(!isset($this->data[$this->name][$id]))
+			if($this->hasAny(array('email' => $data['email'])))
+				return false;
 		return true;
 	}
 

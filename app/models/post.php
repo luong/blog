@@ -4,14 +4,6 @@ class Post extends AppModel {
     var $name = 'Post';
     var $actsAs = array('Containable');
     
-    /*var $hasAndBelongsToMany = array(
-	    	'Tag' => array (
-					'className' => 'Tag',
-					'joinTable' => 'posts_tags',
-					'foreignKey' => 'post_id',
-					'associationForeignKey' => 'tag_id'
-		));*/
-    
     var $hasMany = array(
     		'PostsTag' => array(
     				'className' => 'PostsTag',

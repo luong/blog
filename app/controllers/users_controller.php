@@ -1,12 +1,13 @@
 <?php
 class UsersController extends AppController {
     var $name = 'Users';
-    var $uses = array('User');
+    var $uses = array('User', 'Admin', 'Post');
     var $components = array('Session', 'Email', 'Auth');
     
     function beforeFilter(){
     	parent::beforeFilter();
-    	$this->Auth->allow(array('register', 'active'));
+    	$this->Auth->allow(array('register', 'active', 'admin_logout', 'admin_index', 
+    					'admin_manageUsers', 'admin_delete', 'admin_edit'));
     }
   
     function register() {
@@ -89,6 +90,100 @@ class UsersController extends AppController {
     	} else {
     		echo $this->Email->smtpError;
     	}
+    }
+    
+    function admin_login() {
+    	$this->layout = 'admin';
+    	if(!empty($this->data)) {
+    		$this->Admin->set($this->data);
+    		if($this->Admin->validates()) {
+    			$dataLogin = $this->Admin->find('first', array('conditions' => array(
+    					'username' => $this->data['Admin']['username'],
+    					'password' => $this->data['Admin']['password']
+    				))
+    			);
+    			if($dataLogin != null) {
+    				$this->Session->write('admin.username', $dataLogin['Admin']['username']);
+    				$this->redirect(array('action' => 'index'));
+    			}
+    		}
+    	}
+    }
+    
+    function admin_logout() {
+    	$this->Session->delete('admin.username');
+    	$this->redirect(array('action' => 'admin_login'));
+    }
+    
+    function admin_index() {
+    	$this->layout = 'admin';
+    	if($this->Session->read('admin.username') == null)
+    		$this->redirect(array('action' => 'admin_login'));    		
+    }
+    
+    function admin_manageUsers() {
+    	$this->layout = 'admin';
+    	if($this->Session->read('admin.username') != null) {
+	    	$conditions = array();
+	    	$keyword = '';
+	    	if (!empty($this->params['named']['keyword'])) {
+	    		$keyword = $this->params['named']['keyword'];
+	    		$conditions[] = array (
+	    				'OR' => array(
+	    						'User.email LIKE' => '%' . $keyword . '%',
+	    						'User.firstname LIKE' => '%' . $keyword . '%',
+	    						'User.lastname LIKE' => '%' . $keyword . '%'
+	    				)
+	    		);
+	    	}
+	    	//Limit and Order By
+	    	$this->paginate= array(
+	    			'limit' => 4,
+	    			'order' => array('User.id' => 'asc'),
+	    			'recursive' => -1
+	    	);
+	    	$this->data['User']['keyword'] = $keyword;
+	    	$this->set('users', $this->paginate('User', $conditions));
+    	}
+    	else
+    		$this->redirect(array('action' => 'admin_login'));
+    }
+    
+    function admin_delete($id) {
+    	if($this->Session->read('admin.username') != null) {
+    		if ($this->User->delete($id)) {
+    			// delete all posts of user
+    			$this->Post->deleteAll(array(
+    					'Post.user_id' => $id
+    			), true);
+    			$this->Session->setFlash('The User with id: ' . $id . ' has been deleted.');	
+    		}
+    		$this->redirect(array('action' => 'admin_manageUsers'));
+    	}
+    	else
+    		$this->redirect(array('action' => 'admin_login'));
+    }
+    
+    function admin_edit($id) {
+    	if($this->Session->read('admin.username') != null) {
+    		$this->User->id = $id;
+    		if (empty($this->data)) {
+    			$this->User->recursive = -1;
+    			$this->data = $this->User->find('first', array('conditions' => array('id' => $id),
+    					'fields' => array('id', 'email', 'firstname', 'lastname')
+    				)
+    			);
+    		} else {
+    			$this->User->set($this->data);
+    			if ($this->User->validates()) {
+    				$this->User->saveAll($this->data);
+    				$this->Session->setFlash('User has been updated.');
+    				$this->redirect(array('action' => 'admin_manageUsers'));
+    			}
+    		}
+    	}
+    	else
+    		$this->redirect(array('action' => 'admin_login'));
     }
  
 }
