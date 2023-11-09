@@ -1,6 +1,6 @@
 ---
-slug: dev-blogging-with-docusaurus
-title: Dev Blogging with Docusaurus
+slug: dev-documentation-with-docusaurus
+title: Dev Documentation with Docusaurus
 authors: [luong]
 tags: [docusaurus,documentation]
 keywords: [12g]
