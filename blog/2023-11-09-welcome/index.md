@@ -3,6 +3,10 @@ slug: welcome
 title: Welcome
 authors: [luong]
 tags: [general]
+keywords: [12g]
+draft: false
+unlisted: true
+hide_table_of_contents: true
 ---
 
 [Docusaurus blogging features](https://docusaurus.io/docs/blog) are powered by the [blog plugin](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-blog).

@@ -29,6 +29,10 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
+.footer {
+  padding: 10px !important;
+}
+
 .nav-logo {
   display: none !important;
   font-size: 24px;
