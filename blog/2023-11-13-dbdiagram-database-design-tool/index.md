@@ -9,7 +9,7 @@ unlisted: false
 hide_table_of_contents: true
 ---
 
-Looking for a tool to design database of my new project, I found out a great one in the ninche, that's [DbDiagram](https://dbdiagram.io/). It is really simple to use, designed by [DBML](https://dbml.dbdiagram.io/docs) and exported to MySQL / PostgreSQL or SQL Server in one second. Certainly you can learn and start your database design with DbDiagram in less than ten minutes.
+Looking for a tool to design database of my new project, I found out a great one in the niche, that's [DbDiagram](https://dbdiagram.io/). It is really simple to use, designed by [DBML](https://dbml.dbdiagram.io/docs) and exported to MySQL / PostgreSQL or SQL Server in one second. Certainly you can learn and start your database design with DbDiagram in less than ten minutes.
 
 ![Database design with DbDiagram](design1.png)
 
