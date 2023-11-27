@@ -62,7 +62,7 @@ const config: Config = {
         {
           type: 'html',
           position: 'right',
-          value: '<a href="https://x.com/luongfoxx"><img width="24" src="/img/x.png"/></a>',
+          value: '<a href="https://x.com/luongfeb"><img width="24" src="/img/x.png"/></a>',
         },
         {
           type: 'html',
