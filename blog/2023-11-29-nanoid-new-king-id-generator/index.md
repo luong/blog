@@ -9,7 +9,7 @@ unlisted: false
 hide_table_of_contents: true
 ---
 
-[NanoID](https://github.com/ai/nanoid) is a lib for generating random identifiers. It is compared to [UUID](https://www.npmjs.com/package/uuid) but said faster, smaller in code size, friendlier in URL, and shorter in length (21 symbols vs 36) although both have the same collision probability. Also NanoId is widely ported to over 20 programming langiages.
+[NanoID](https://github.com/ai/nanoid) is a lib for generating random identifiers. It is compared to [UUID](https://www.npmjs.com/package/uuid) but said faster, smaller in code size, friendlier in URL, and shorter in length (21 symbols vs 36) although both have the same collision probability. Also NanoId is widely ported to over 20 programming languages.
 
 For instance, with speed of generating 1000 IDs per hours, it needs ~149 billion years or 1,307,660T IDs in order to have a 1% probability of at least one collision.
 
