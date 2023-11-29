@@ -30,7 +30,7 @@ In case you want to customize alphabet or ID length:
 ```js
 import { customAlphabet } from 'nanoid';
 const nanoid = customAlphabet('1234567890abcdef', 10);
-const id = nanoid() // "4f90d13a42"
+const id = nanoid(); // "4f90d13a42"
 ```
 
 ## References
